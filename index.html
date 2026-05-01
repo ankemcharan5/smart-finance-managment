@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exact Finance Dashboard</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:,">
+
+<style>
+/* ================= BASE STYLES ================= */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter',sans-serif;
+  transition:all .25s ease;
+}
+
+body{
+  background:linear-gradient(135deg,#f8fafc,#eef2ff);
+}
+
+/* ---------- TOP CENTER TITLE ---------- */
+.top-center-title{
+  position:fixed;
+  top:20px;
+  left:60%;
+  transform:translateX(-50%);
+  font-size:28px;
+  font-weight:700;
+  color:#c91c1c;
+  text-shadow:0 0 12px rgba(201,28,28,.5);
+  z-index:10;
+  display:none;   /* 👈 hidden on login page */
+}
+
+
+/* ================= AUTH ================= */
+.auth{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+    linear-gradient(rgba(17,24,39,.65),rgba(20,184,166,.55)),
+    url("https://images.unsplash.com/photo-1601597111158-2fceff292cdc");
+  background-size:cover;
+}
+
+.auth-box{
+  background:rgba(255,255,255,.92);
+  width:340px;
+  padding:30px;
+  border-radius:18px;
+  backdrop-filter:blur(12px);
+  box-shadow:0 20px 50px rgba(0,0,0,.3);
+  animation:fadeUp .7s ease;
+}
+
+.auth-box h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.auth-box input{
+  width:100%;
+  padding:12px;
+  margin-bottom:15px;
+  border:1px solid #d1d5db;
+  border-radius:10px;
+}
+
+.auth-box input:focus{
+  outline:none;
+  border-color:#0ea5e9;
+  box-shadow:0 0 0 3px rgba(14,165,233,.25);
+}
+
+.auth-box button{
+  width:100%;
+  padding:12px;
+  background:linear-gradient(135deg,#14b8a6,#0ea5e9);
+  border:none;
+  color:#fff;
+  font-weight:600;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.auth-box button:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 25px rgba(14,165,233,.4);
+}
+
+.switch{
+  text-align:center;
+  margin-top:15px;
+  color:#2563eb;
+  cursor:pointer;
+}
+
+.switch:hover{text-decoration:underline;}
+
+.error{
+  text-align:center;
+  color:#dc2626;
+  margin-top:10px;
+}
+
+/* ================= DASHBOARD ================= */
+.app{
+  display:none;
+  min-height:100vh;
+  
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{
+  width:250px;
+  background:#111827;
+  color:#fff;
+  padding:24px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  box-shadow:4px 0 30px rgba(0,0,0,.45);
+}
+
+.logo{
+  font-size:22px;
+  font-weight:700;
+  margin-bottom:30px;
+  letter-spacing:1px;
+  color:#22d3ee;
+}
+
+.nav a{
+  display:block;
+  padding:12px 16px;
+  border-radius:12px;
+  margin-bottom:10px;
+  color:#cbd5e1;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+
+.nav a::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:4px;
+  height:100%;
+  background:#22d3ee;
+  transform:scaleY(0);
+  transition:.3s;
+}
+
+.nav a.active,
+.nav a:hover{
+  background:#1f2937;
+  color:#fff;
+}
+
+.nav a.active::before,
+.nav a:hover::before{
+  transform:scaleY(1);
+}
+
+/* ---------- MAIN ---------- */
+.main{
+  flex:1;
+  padding:32px;
+  background:linear-gradient(180deg,#f9fafb,#eef2ff);
+  border-radius:30px 0 0 30px;
+}
+
+.main h1{
+  font-size:26px;
+  margin-bottom:24px;
+}
+
+/* ---------- PAGES ---------- */
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .5s ease;}
+
+/* ---------- CARDS ---------- */
+.top-cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:20px;
+}
+
+.card{
+  background:#fff;
+  padding:22px;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+}
+
+.card:hover{
+  transform:translateY(-6px) scale(1.02);
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+}
+
+.card.dark{
+  background:linear-gradient(135deg,#020617,#1e293b);
+  color:#fff;
+}
+
+.card h4{
+  font-size:13px;
+  color:#9ca3af;
+}
+
+.card.dark h4{color:#cbd5e1;}
+
+.card p{
+  font-size:24px;
+  font-weight:700;
+}
+
+/* ---------- LAYOUT ---------- */
+.layout{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:24px;
+  margin-top:24px;
+}
+
+.section{
+  background:#fff;
+  padding:22px;
+  border-radius:18px;
+  margin-bottom:24px;
+  box-shadow:0 10px 30px rgba(0,0,0,.08);
+  animation:fadeUp .6s ease;
+}
+
+/* ---------- TRANSACTIONS ---------- */
+.transactions li,
+.recurring li{
+  list-style:none;
+  display:flex;
+  justify-content:space-between;
+  padding:12px 10px;
+  border-bottom:1px solid #e5e7eb;
+  border-radius:10px;
+}
+
+.transactions li:hover,
+.recurring li:hover{
+  background:#f1f5f9;
+  transform:translateX(6px);
+}
+
+.plus{color:#16a34a;font-weight:600;}
+.minus{color:#dc2626;font-weight:600;}
+
+/* ---------- POTS ---------- */
+.pots{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+
+.pot{
+  background:#f8fafc;
+  border-left:4px solid #14b8a6;
+  padding:16px;
+  border-radius:14px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.pot:hover{
+  transform:scale(1.05);
+  background:#ecfeff;
+}
+
+/* ---------- DONUT ---------- */
+.donut{
+  width:160px;
+  height:160px;
+  border-radius:50%;
+  background:conic-gradient(#14b8a6 0% 65%,#e5e7eb 65% 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:20px auto;
+  font-size:22px;
+  font-weight:700;
+  box-shadow:0 12px 30px rgba(0,0,0,.2);
+}
+
+/* ---------- ANIMATION ---------- */
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px);}
+  to{opacity:1;transform:translateY(0);}
+}
+</style>
+</head>
+
+<body>
+
+<!-- AUTH -->
+<div class="auth" id="authPage">
+  <div class="auth-box">
+    <h2 id="title">Login</h2>
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+    <button onclick="submitAuth()">Login</button>
+    <div class="switch" onclick="toggleAuth()">Don't have an account? Sign Up</div>
+    <div class="error" id="msg"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="app" id="dashboard">
+<aside class="sidebar">
+  <div>
+    <div class="logo">finance</div>
+    <nav class="nav">
+      <a class="active" data-page="overview">Overview</a>
+      <a data-page="transactions">Transactions</a>
+      <a data-page="budgets">Budgets</a>
+      <a data-page="recurring">Recurring Bills</a>
+    </nav>
+  </div>
+</aside>
+
+<main class="main">
+<div class="top-center-title">Smart Finance Management</div>
+
+<!-- OVERVIEW -->
+<div class="page active" id="overview">
+<h1>Overview</h1>
+
+<div class="top-cards">
+  <div class="card dark"><h4>Current Balance</h4><p>$4,836.00</p></div>
+  <div class="card"><h4>Income</h4><p>$3,814.25</p></div>
+  <div class="card"><h4>Expenses</h4><p>$1,700.50</p></div>
+</div>
+
+<div class="layout">
+  <div class="section">
+    <h3>Recent Transactions</h3>
+    <ul class="transactions">
+      <li><span>Salary</span><span class="plus">+ $3,200</span></li>
+      <li><span>Groceries</span><span class="minus">- $120</span></li>
+      <li><span>Electricity</span><span class="minus">- $90</span></li>
+      <li><span>Fuel</span><span class="minus">- $75</span></li>
+      <li><span>Dining</span><span class="minus">- $140</span></li>
+      <li><span>Freelance</span><span class="plus">+ $614</span></li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <h3>Spending</h3>
+    <div class="donut">65%</div>
+    <ul class="transactions">
+      <li><span>Food</span><span>$520</span></li>
+      <li><span>Rent</span><span>$800</span></li>
+      <li><span>Utilities</span><span>$150</span></li>
+      <li><span>Entertainment</span><span>$230</span></li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- OTHER PAGES (UNCHANGED) -->
+<div class="page" id="transactions"><h1>Transactions</h1></div>
+<div class="page" id="budgets"><h1>Budgets</h1></div>
+<div class="page" id="recurring"><h1>Recurring Bills</h1></div>
+
+</main>
+</div>
+<script>
+/* ================= AUTH ================= */
+let isLogin=true;
+
+function toggleAuth(){
+  isLogin=!isLogin;
+  title.innerText=isLogin?"Login":"Sign Up";
+  document.querySelector("button").innerText=isLogin?"Login":"Sign Up";
+  document.querySelector(".switch").innerText=isLogin?
+  "Don't have an account? Sign Up":"Already have an account? Login";
+  msg.innerText="";
+}
+
+async function submitAuth(){
+  const url=isLogin?
+  "http://127.0.0.1:5000/login":
+  "http://127.0.0.1:5000/signup";
+
+  try{
+    const r=await fetch(url,{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        username:username.value,
+        password:password.value
+      })
+    });
+    const d=await r.json();
+    if(d.success){
+  authPage.style.display="none";
+  dashboard.style.display="flex";
+  document.querySelector(".top-center-title").style.display="block"; // 👈 show after login
+  loadAllData();
+    }else msg.innerText=d.message;
+  }catch{
+    msg.innerText="Backend not reachable";
+  }
+}
+
+/* ================= DATA ================= */
+const transactionsData = [
+  { name:"Salary", amount:3200, type:"income" },
+  { name:"Freelance", amount:614, type:"income" },
+  { name:"Groceries", amount:120, type:"expense" },
+  { name:"Electricity", amount:90, type:"expense" },
+  { name:"Fuel", amount:75, type:"expense" },
+  { name:"Dining", amount:140, type:"expense" }
+];
+
+const budgetsData = [
+  { category:"Food", spent:520, limit:700 },
+  { category:"Rent", spent:800, limit:800 },
+  { category:"Entertainment", spent:230, limit:400 },
+  { category:"Utilities", spent:150, limit:250 }
+];
+
+const recurringBills = [
+  { name:"Netflix", amount:15 },
+  { name:"Internet", amount:40 },
+  { name:"Electricity", amount:90 },
+  { name:"Phone Bill", amount:25 }
+];
+
+/* ================= LOADERS ================= */
+function loadAllData(){
+  renderTransactions(transactionsData);
+  renderBudgets();
+  renderRecurring();
+}
+
+/* ================= TRANSACTIONS ================= */
+function renderTransactions(data){
+  const page=document.getElementById("transactions");
+  page.innerHTML="<h1>Transactions</h1><ul class='transactions'></ul>";
+  const ul=page.querySelector("ul");
+
+  data.forEach(t=>{
+    const li=document.createElement("li");
+    li.innerHTML=`
+      <span>${t.name}</span>
+      <span class="${t.type==='income'?'plus':'minus'}">
+        ${t.type==='income'?'+':'-'} $${t.amount}
+      </span>`;
+    ul.appendChild(li);
+  });
+}
+
+/* ================= BUDGETS ================= */
+function renderBudgets(){
+  const page=document.getElementById("budgets");
+  page.innerHTML="<h1>Budgets</h1>";
+
+  budgetsData.forEach(b=>{
+    const percent=Math.min((b.spent/b.limit)*100,100);
+    page.innerHTML+=`
+      <div class="section">
+        <h3>${b.category}</h3>
+        <p>$${b.spent} / $${b.limit}</p>
+        <div style="background:#e5e7eb;border-radius:10px;height:10px;">
+          <div style="
+            width:${percent}%;
+            height:100%;
+            background:#14b8a6;
+            border-radius:10px;">
+          </div>
+        </div>
+      </div>`;
+  });
+}
+
+/* ================= RECURRING ================= */
+function renderRecurring(){
+  const page=document.getElementById("recurring");
+  page.innerHTML="<h1>Recurring Bills</h1><ul class='recurring'></ul>";
+  const ul=page.querySelector("ul");
+
+  recurringBills.forEach(b=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span>${b.name}</span><span>$${b.amount}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+/* ================= INCOME / EXPENSE CLICK ================= */
+document.querySelectorAll(".top-cards .card")[1].onclick=()=>{
+  renderTransactions(transactionsData.filter(t=>t.type==="income"));
+  activatePage("transactions");
+};
+
+document.querySelectorAll(".top-cards .card")[2].onclick=()=>{
+  renderTransactions(transactionsData.filter(t=>t.type==="expense"));
+  activatePage("transactions");
+};
+
+/* ================= NAV ================= */
+const links=document.querySelectorAll(".nav a");
+const pages=document.querySelectorAll(".page");
+
+function activatePage(id){
+  links.forEach(l=>l.classList.remove("active"));
+  pages.forEach(p=>p.classList.remove("active"));
+  document.querySelector(`[data-page="${id}"]`).classList.add("active");
+  document.getElementById(id).classList.add("active");
+}
+
+links.forEach(link=>{
+  link.onclick=()=>{
+    activatePage(link.dataset.page);
+  }
+});
+</script>
+
+
+</body>
+</html>
